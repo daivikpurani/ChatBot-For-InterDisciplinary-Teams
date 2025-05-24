@@ -1,0 +1,80 @@
+graph TB
+    subgraph Frontend
+        UI[Chat Interface]
+        State[State Management]
+        UI --> State
+    end
+
+    subgraph Backend
+        subgraph DataProcessing
+            PDF[PDF Processing]
+            Text[Text Extraction]
+            Clean[Text Cleaning]
+            PDF --> Text --> Clean
+        end
+
+        subgraph VectorStore
+            Embed[Embedding Generation]
+            Store[Vector Database]
+            Clean --> Embed --> Store
+        end
+
+        subgraph QueryProcessing
+            Query[Query Handler]
+            Search[Semantic Search]
+            Context[Context Management]
+            Query --> Search --> Context
+        end
+
+        subgraph PromptSystem
+            Prompt[Prompt Management]
+            Template[Template Engine]
+            Prompt --> Template
+        end
+    end
+
+    subgraph Integration
+        API[API Gateway]
+        WS[WebSocket Server]
+        Auth[Authentication]
+        Cache[Cache Layer]
+    end
+
+    %% Frontend to Backend connections
+    UI --> API
+    UI --> WS
+    State --> API
+
+    %% Backend internal connections
+    Search --> Store
+    Context --> Store
+    Template --> Query
+
+    %% Integration connections
+    API --> Auth
+    API --> Cache
+    WS --> Auth
+
+    %% External Services
+    subgraph ExternalServices
+        Pinecone[(Pinecone DB)]
+        LLM[Language Model]
+    end
+
+    Store --> Pinecone
+    Embed --> LLM
+    Search --> LLM
+
+    %% Styling with report-friendly colors
+    style UI fill:#2E86C1,stroke:#1A5276,color:white
+    style State fill:#2E86C1,stroke:#1A5276,color:white
+    style DataProcessing fill:#E74C3C,stroke:#922B21,color:white
+    style VectorStore fill:#E74C3C,stroke:#922B21,color:white
+    style QueryProcessing fill:#E74C3C,stroke:#922B21,color:white
+    style PromptSystem fill:#E74C3C,stroke:#922B21,color:white
+    style API fill:#27AE60,stroke:#196F3D,color:white
+    style WS fill:#27AE60,stroke:#196F3D,color:white
+    style Auth fill:#27AE60,stroke:#196F3D,color:white
+    style Cache fill:#27AE60,stroke:#196F3D,color:white
+    style Pinecone fill:#F39C12,stroke:#9A7D0A,color:white
+    style LLM fill:#F39C12,stroke:#9A7D0A,color:white 

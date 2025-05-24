@@ -1,0 +1,72 @@
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
+import time
+
+def setup_driver():
+    """Initializes a headless Chrome WebDriver."""
+    options = Options()
+    options.add_argument("--headless")  # Run Chrome in headless mode (no GUI)
+    options.add_argument("--disable-gpu")
+    options.add_argument("--window-size=1920x1080")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=options)
+    return driver
+
+def extract_text(driver):
+    """Extracts structured text from a page."""
+    text_content = []
+    for tag in ["h1", "h2", "h3", "p", "li"]:
+        elements = driver.find_elements(By.TAG_NAME, tag)
+        for element in elements:
+            text_content.append(f"{tag.upper()}: {element.text.strip()}")
+    return "\n".join(text_content)
+
+def extract_links(driver):
+    """Extracts all valid links from the page."""
+    links = set()
+    elements = driver.find_elements(By.TAG_NAME, "a")
+    for element in elements:
+        href = element.get_attribute("href")
+        if href and href.startswith("http"):
+            links.add(href)
+    return list(links)
+
+def main(start_url):
+    driver = setup_driver()
+    visited = set()
+    queue = [start_url]
+
+    with open("output.txt", "w", encoding="utf-8") as file:
+        while queue:
+            url = queue.pop(0)
+            if url in visited:
+                continue
+            visited.add(url)
+
+            print(f"\nFetching: {url}")
+            try:
+                driver.get(url)
+                time.sleep(2)  # Allow JavaScript to load
+
+                page_text = extract_text(driver)
+                print(f"Successfully fetched {url}")
+                file.write(f"URL: {url}\n{page_text}\n\n")
+
+                links = extract_links(driver)
+                queue.extend([link for link in links if link not in visited])
+
+            except Exception as e:
+                print(f"Error accessing {url}: {e}")
+                continue
+
+    driver.quit()
+
+if __name__ == "__main__":
+    start_url = "https://sf.funcheap.com/"
+    main(start_url)

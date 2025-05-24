@@ -1,0 +1,36 @@
+# Node modules
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Logs
+logs
+*.log
+log/*.log
+
+# Environment variables
+.env
+.env.local
+
+# Build files
+dist/
+build/
+
+# Dependency directories
+jspm_packages/
+
+# Database files
+*.sqlite
+*.sqlite-journal
+
+# Temporary files
+*.tmp
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# TypeScript
+*.tsbuildinfo
